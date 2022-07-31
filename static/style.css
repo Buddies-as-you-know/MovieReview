@@ -1,0 +1,12 @@
+body {
+      background-color:#ffff; 
+      color:#000000;
+} 
+.nav-item{
+      font-size: 2rem;
+      text-align:center;
+}
+.navbar-brand{
+      font-family:fantasy;
+      margin-left: 5px;
+}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Trending</h2>
+    <div class="input-group mb-3">
+        <select method="POST" class="form-select" id="media_type" name = "media_type" title="media_type">
+          <option selected>All Trending Media Types</option>
+          <option value="movie">All Trending Movies(day)</option>
+          <option value="tv">All Trending TV Shows(day)</option>
+          <option value="person">All Trending Persons(day)</option>
+        </select>
+    </div>
+    <a href="{% url 'score_by' %}" class="btn btn-success btn-lg btn-block" >Ranking</a>
+    
+    <div id="trendings" class="row justify-content-md-center">
+
+    </div>
+    {% load static %}
+    <script src="{% static 'js/Movieindex.js' %}"></script>
+    
+{% endblock %}

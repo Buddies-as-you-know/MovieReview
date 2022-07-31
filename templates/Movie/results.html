@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css\notsearch.css' %}">
+    <div class="row">
+        {%if data.results%}
+        {% for m in data.results %}
+            <div class="card" style="width: 18rem;">
+                <img src="https://image.tmdb.org/t/p/w200{{ m.poster_path }}" class="card-img-top" alt="...">
+                <div class="card-body">
+                {% if not m.name %}
+                    <h5 class="card-title">{{ m.title }}</h5>
+                {% else %}
+                    <h5 class="card-title">{{ m.name }}</h5>
+                {% endif %}
+                <p class="card-text">{{ m.overview }}</p>
+                <a href="/{{ type }}/{{ m.id }}/" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+        {% endfor %}
+        {%else%}
+        <div class = "aligncenter">
+            <img src="{% static "image/htb_fukusuke.jpg"%}" width="500" height="400">
+            <h1>The searched title was not found.</h1>
+        </div>
+        {%endif%}
+    </div>
+{% endblock %}

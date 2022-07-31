@@ -1,0 +1,9 @@
+h2.rate::before {
+    content: "★★★★★★★★★★";
+    background-image: linear-gradient(90deg, gold 0% calc(var(--rating)/10*100%), gray calc(var(--rating)/10*100%) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    font-feature-settings: "palt";
+    font-family: 游ゴシック, "Yu Gothic", YuGothic, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+}
