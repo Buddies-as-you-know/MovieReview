@@ -1,7 +1,35 @@
+
 # MovieReview
 qiitaに乗せました！！！
 https://qiita.com/RyeWiskey/items/29858102806635bb2691
 
+# ローカルでの環境構築方法
+個人のSECRET_KEY(MovieReview/local_setting.py)とTMDBのAPIKEYを取得してください.
+## requirement.txtで必要なライブラリをダウンロードしてください
+```
+pip install -r requirements.txt
+```
+## local環境に設定してください
+settings.pyの
+```
+"""
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'name',
+        'USER': 'user',
+        'PASSWORD': '',
+        'HOST': 'host',
+        'PORT': '',
+    }
+}
+"""
+```
+のコメントアウトを外します。
+そして、
+```
+python manage.py runserver
+```
 # herokuにデプロイもしています！！！
 
 https://filmer-000.herokuapp.com/
