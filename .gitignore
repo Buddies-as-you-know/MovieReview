@@ -1,4 +1,7 @@
-/__pycache__/
+/Movies/templatetags/__pycache__/
+/Movies/__pycache__/
+/MovieReview/__pycache__/
+/accounts/__pycache__/
 /db.sqlite3
 /DS_Store/
 /MovieReview/local_settings.py/
