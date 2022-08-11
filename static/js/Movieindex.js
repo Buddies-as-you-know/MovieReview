@@ -20,7 +20,7 @@ fetchTrendingResults("all", "week")
                 for (let i=0; i<data.results.length; i++) {
                     var mainDiv = document.createElement("div");
                     mainDiv.setAttribute("class", "card");
-                    mainDiv.setAttribute("style", "width: 20rem;");
+                    mainDiv.setAttribute("style", "width: 22rem;");
                     var img = document.createElement("img");
                     img.setAttribute("src", "https://image.tmdb.org/t/p/w200" + data.results[i].poster_path);
                     img.setAttribute("class", "card-img-top");

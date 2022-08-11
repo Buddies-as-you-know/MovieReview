@@ -11,39 +11,49 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('Movies', '0001_initial'),
+        ("Movies", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='comment_tv',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="comment_tv",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
-            model_name='comment_movie',
-            name='movie',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Movies.movie'),
+            model_name="comment_movie",
+            name="movie",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="Movies.movie"
+            ),
         ),
         migrations.AddField(
-            model_name='comment_movie',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="comment_movie",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddIndex(
-            model_name='comment_tv',
-            index=models.Index(fields=['user', 'tv'], name='Movies_comm_user_id_997f47_idx'),
+            model_name="comment_tv",
+            index=models.Index(
+                fields=["user", "tv"], name="Movies_comm_user_id_997f47_idx"
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='comment_tv',
-            unique_together={('user', 'tv')},
+            name="comment_tv",
+            unique_together={("user", "tv")},
         ),
         migrations.AddIndex(
-            model_name='comment_movie',
-            index=models.Index(fields=['user', 'movie'], name='Movies_comm_user_id_6ff203_idx'),
+            model_name="comment_movie",
+            index=models.Index(
+                fields=["user", "movie"], name="Movies_comm_user_id_6ff203_idx"
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='comment_movie',
-            unique_together={('user', 'movie')},
+            name="comment_movie",
+            unique_together={("user", "movie")},
         ),
     ]

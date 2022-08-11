@@ -20,7 +20,7 @@
 
     {% for m in movie %}
     <div class="col">
-        <div class="card"style="width: 25rem;">
+        <div class="card"style="width: 22rem;">
             <img src="https://image.tmdb.org/t/p/w200{{ m.poster_path }}" class="card-img-top" alt="...">
             <div class="card-body">
             {% if not m.name %}
@@ -28,7 +28,7 @@
             {% else %}
                 <h5 class="card-title">{{ m.name }}</h5>
             {% endif %}
-            <h1 class="card-text">{{ m.Ranking }}th</h1>
+            <h1 class="card-text">{{ forloop.counter0|add:movie.start_index }}th</h1>
             <h2 class = "rate" style="--rating:{{m.score}}">{{m.score}}</h2>
             <a href="/movie/{{ m.id }}/" class="btn btn-primary">View Details</a>
             </div>
@@ -46,7 +46,7 @@
             {% else %}
                 <h5 class="card-title">{{ t.name }}</h5>
             {% endif %}
-            <h1 class="card-text">{{ t.Ranking }}th</h1>
+            <h1 class="card-text">{{ forloop.counter0|add:tv.start_index }}th</h1>
             <h2 class = "rate" style="--rating:{{t.score}}">{{t.score}}</h2>
             <a href="/tv/{{ t.id }}/" class="btn btn-primary">View Details</a>
             </div>

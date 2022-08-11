@@ -20,10 +20,10 @@ from django.urls import include, path
 from . import settings  # mediaを使うために追加
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('accounts/', include('allauth.urls')),  # 追加
-    path('accounts/', include('accounts.urls')),  # 追加
-    path('', include('Movies.urls'))
+    path("admin/", admin.site.urls),
+    path("accounts/", include("allauth.urls")),  # 追加
+    path("accounts/", include("accounts.urls")),  # 追加
+    path("", include("Movies.urls")),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.IMAGE_URL, document_root=settings.IMAGE_ROOT)  # 追加
