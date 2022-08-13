@@ -1,86 +1,39 @@
 import requests
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.http.response import JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from Movies.forms import Comment_movie_CreateForm, Comment_tv_CreateForm
 from Movies.models import TV, Comment_movie, Comment_tv, Movie
+from Movies.wrapper import CreateSearchAndReturnTVOrMovie
+from Tmdb_api_key import TMDB_API_KEY
+
 
 # Create your views here.
-
-TMDB_API_KEY = "XXXXX"
-
-
 def search(request):
     # Get the query from the search box
-    query = request.GET.get("q")
+    search_query = request.GET.get("q")
+    search_data_odject = CreateSearchAndReturnTVOrMovie("search", request=request)
     # If the query is not empty
-    if query:
-        data = requests.get(
-            f"https://api.themoviedb.org/3/search/{request.GET.get('type')}?api_key={TMDB_API_KEY}&language=en-US&page=1&include_adult=false&query={query}"
-        )
-    else:
+    if search_query is None:
         return render(request, "Movie/not_search.html")
-
-    # Render the template
+    context_data = search_data_odject.search_data(search_query)
     return render(
         request,
         "Movie/results.html",
-        {"data": data.json(), "type": request.GET.get("type")},
+        context_data,
     )
 
 
-def Score_by(request):
-    query_min = 0
-    query_max = 10
-    if request.GET.get("min") and request.GET.get("max"):
-        query_min = request.GET.get("min")
-        query_max = request.GET.get("max")
+def score_by(request):
     movies = Movie.objects.order_by("-stars")
-    if movies.exists():
-        movie_list = []
-
-        for obj in movies:
-            if (float(query_min) <= float(obj.average_stars())) and (
-                float(query_max) >= float(obj.average_stars())
-            ):
-                data = requests.get(
-                    f"https://api.themoviedb.org/3/movie/{obj.id}?api_key={TMDB_API_KEY}&language=en-US"
-                )
-                data_movie = data.json()
-                data_movie["score"] = obj.average_stars()
-                movie_list.append(data_movie)
-
-        paginator_movie = Paginator(movie_list, 3)
-        page_movie = request.GET.get("page", 1)
-        try:
-            pages_movie = paginator_movie.page(page_movie)
-        except PageNotAnInteger:
-            pages_movie = paginator_movie.page(1)
-
-        except EmptyPage:
-            pages_movie = paginator_movie.page(1)
-    tv = TV.objects.order_by("-stars")
-    tv_list = []
-    if tv.exists():
-        for obj in tv:
-            if (float(query_min) <= float(obj.average_stars())) and (
-                float(query_max) >= float(obj.average_stars())
-            ):
-                data = requests.get(
-                    f"https://api.themoviedb.org/3/tv/{obj.id}?api_key={TMDB_API_KEY}&language=en-US"
-                )
-                data_tv = data.json()
-                data_tv["score"] = obj.stars
-                tv_list.append(data_tv)
-        paginator_tv = Paginator(tv_list, 3)
-        page_tv = request.GET.get("page", 1)
-        try:
-            pages_tv = paginator_tv.page(page_tv)
-        except PageNotAnInteger:
-            pages_tv = paginator_tv.page(1)
-        except EmptyPage:
-            pages_tv = paginator_tv.page(1)
+    movie_score_data = CreateSearchAndReturnTVOrMovie("movie", movies, inputs_request=request)
+    movie_score_data.score_by_data_format_save()
+    pages_movie = movie_score_data.pagitor_deliver(3)
+    tvs = TV.objects.order_by("-stars")
+    tv_score_data = CreateSearchAndReturnTVOrMovie("tv", tvs, inputs_request=request)
+    tv_score_data.score_by_data_format_save()
+    pages_tv = tv_score_data.pagitor_deliver(3)
     context = {"movie": pages_movie, "tv": pages_tv}
     return render(request, "Movie/score_by.html", context)
 
@@ -90,7 +43,7 @@ def index(request):
 
 
 def view_tv_detail(request, tv_id):
-    if not (TV.objects.filter(id=tv_id)):
+    if TV.objects.filter(id=tv_id).exists() is None:
         TV(id=tv_id).save()
     tv = get_object_or_404(TV, id=tv_id)
 
@@ -157,8 +110,7 @@ def view_tv_detail(request, tv_id):
 
 
 def view_movie_detail(request, movie_id):
-
-    if not (Movie.objects.filter(id=movie_id)):
+    if Movie.objects.filter(id=movie_id).exists() is None:
         Movie(id=movie_id).save()
     movie = get_object_or_404(Movie, id=movie_id)
 
@@ -233,11 +185,14 @@ def view_movie_detail(request, movie_id):
     return render(request, "Movie/movie_detail.html", context)
 
 
-def view_trendings_results(request):
-    type = request.GET.get("media_type")
-    time_window = request.GET.get("time_window")
+def view_trendings_results(request) -> JsonResponse:
 
-    trendings = requests.get(
-        f"https://api.themoviedb.org/3/trending/{type}/{time_window}?api_key={TMDB_API_KEY}&language=en-US"
-    )
-    return JsonResponse(trendings.json())
+    types: str = request.GET.get("media_type")
+    time_window: str = request.GET.get("time_window")
+
+    trendings: dict = (
+        requests.get(
+            f"https://api.themoviedb.org/3/trending/{types}/{time_window}?api_key={TMDB_API_KEY}&language=en-US"
+        )
+    ).json()
+    return JsonResponse(trendings)
