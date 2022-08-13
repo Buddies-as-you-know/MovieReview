@@ -24,6 +24,7 @@ DATABASES = {
     }
 }
 """
+
 を
 ```
 DATABASES = {
