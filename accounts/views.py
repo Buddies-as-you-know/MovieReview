@@ -12,13 +12,11 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import UpdateView
-from Movies.models import Comment_movie, Comment_tv
+from Tmdb_api_key import TMDB_API_KEY
 
 from accounts.forms import (MyPasswordChangeForm, MyPasswordResetForm,
                             MySetPasswordForm, ProfileForm)
 from accounts.models import CustomUser
-
-TMDB_API_KEY = "XXXXXX"
 
 
 # userのhome

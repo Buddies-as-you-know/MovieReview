@@ -35,7 +35,7 @@
         <label for="range-example">
             ・score<span id="current-value"></span>
         </label>
-        {% if comment_movie %}
+        {% if mycomment %}
         <button type="submit"name="action" value="update">Edit Comment</button>
         <button type="submit" name="action" value="delete">Delete Comment</button>
         {% else %}
@@ -54,15 +54,15 @@
             <th>comment</th>
             <th>evaluation</th>
             </tr>
-            {% for c in mycomment %}
+            {%if mycomment%}
             <tr>
-                    <td><a href ="{% url 'accounts:comment_list_movie' c.user.id %}"><img class="rounded-circle" src="{{ c.user.avatar.url }}" alt="..."width="100" height="100"></a></td>
-                    <td>{{ c.user.nickname }}</td>
-                    <td>{{ c.created_at }} </td> 
-                    <td>{{ c.comment }}</td>
-                    <td><h2 class = "rate" style="--rating:{{c.stars}}">{{c.stars}}</h2></td>
+                    <td><img class="rounded-circle" src="{{ mycomment.user.avatar.url }}" alt="..."width="100" height="100"></td>
+                    <td>{{ mycomment.user.nickname }}</td>
+                    <td>{{ mycomment.created_at }} </td> 
+                    <td>{{ mycomment.comment }}</td>
+                    <td><h2 class = "rate" style="--rating:{{mycomment.stars}}">{{mycomment.stars}}</h2></td>
             </tr>
-        {% endfor %}
+            {%endif%}
             {% for c in pages %}
             <tr>
                     <td><a href ="{% url 'accounts:comment_list_movie' c.user.id %}"><img class="rounded-circle" src="{{ c.user.avatar.url }}" alt="..."width="100" height="100"></a></td>

@@ -3,8 +3,8 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css\notsearch.css' %}">
     <div class="row">
-        {%if data.results%}
-        {% for m in data.results %}
+        {%if search_data.results%}
+        {% for m in search_data.results %}
             <div class="card" style="width: 18rem;">
                 <img src="https://image.tmdb.org/t/p/w200{{ m.poster_path }}" class="card-img-top" alt="...">
                 <div class="card-body">
