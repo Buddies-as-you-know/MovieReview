@@ -1,6 +1,7 @@
 from accounts.models import CustomUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import CheckConstraint, Q, Sum
 from django.utils import timezone
 
 
@@ -10,33 +11,32 @@ class TVAndMovie(models.Model):
         blank=False,
         null=False,
     )
-    
+
     judge_tv_or_movie = models.CharField(
         blank=False, null=False, default="movie", max_length=20
     )
     stars = models.FloatField(
         blank=False,
         null=False,
-        default=0,
+        default=0.00,
         validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
     )
 
-    def get_comments(self) -> object:
-        return Comment.objects.filter(
-            tv_or_movie_id=self.id
-        )
-
     def average_stars(self) -> float:
-        comments = self.get_comments()
-        n_comments = comments.count()
-        if n_comments:
-            self.stars = round(
-                sum([comment.stars for comment in comments]) / n_comments, 3
-            )
+        count = self.comment_set.count()
+        if count:
+            get_sum = self.comment_set.aggregate(Sum("stars"))
+            self.stars = round(get_sum["stars__sum"] / count, 3)
         else:
-            self.stars = 0
+            self.stars = 0.00
         self.save()
         return self.stars
+        """
+        self.stars = round(self.comment_set.aggregate(Avg('stars')).get('stars__avg'), 3)
+        self.save()
+        return self.stars or 0
+        """
+
 
 class Comment(models.Model):
 
@@ -55,22 +55,28 @@ class Comment(models.Model):
     class Meta:
         unique_together = ("user", "tv_or_movie")
         indexes = [models.Index(fields=["user", "tv_or_movie"])]
+        constraints = (
+            # for checking in the DB
+            CheckConstraint(
+                check=Q(stars__gte=0.0) & Q(stars__lte=10.0), name="cooment_stars_range"
+            ),
+        )
 
 
-class LikeForMovie(models.Model):
+class LikeForMovieAndTV(models.Model):
 
     movie = models.ForeignKey(TVAndMovie, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=timezone.now)
 
 
-class WantToSeeMovie(models.Model):
+class WantToSeeMovieAndTV(models.Model):
     movie = models.ForeignKey(TVAndMovie, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=timezone.now)
 
 
-class LikeForComment_movie(models.Model):
+class LikeForComment(models.Model):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=timezone.now)

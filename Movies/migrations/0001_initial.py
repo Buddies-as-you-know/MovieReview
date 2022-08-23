@@ -10,49 +10,123 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Comment',
+            name="Comment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('comment', models.TextField(max_length=1000)),
-                ('stars', models.FloatField(default=0, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(10.0)])),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("comment", models.TextField(max_length=1000)),
+                (
+                    "stars",
+                    models.FloatField(
+                        default=0,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(10.0),
+                        ],
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
         ),
         migrations.CreateModel(
-            name='LikeForComment_movie',
+            name="LikeForComment_movie",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('timestamp', models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("timestamp", models.DateTimeField(default=django.utils.timezone.now)),
             ],
         ),
         migrations.CreateModel(
-            name='LikeForMovie',
+            name="LikeForMovie",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('timestamp', models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("timestamp", models.DateTimeField(default=django.utils.timezone.now)),
             ],
         ),
         migrations.CreateModel(
-            name='TVAndMovie',
+            name="TVAndMovie",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('tmdb_id', models.CharField(editable=False, max_length=9999, validators=[django.core.validators.RegexValidator('^[0-9]*$', 'Only alphanumeric characters are allowed.')])),
-                ('judge_tv_or_movie', models.CharField(default='movie', max_length=20)),
-                ('stars', models.FloatField(default=0, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(10.0)])),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "tmdb_id",
+                    models.CharField(
+                        editable=False,
+                        max_length=9999,
+                        validators=[
+                            django.core.validators.RegexValidator(
+                                "^[0-9]*$", "Only alphanumeric characters are allowed."
+                            )
+                        ],
+                    ),
+                ),
+                ("judge_tv_or_movie", models.CharField(default="movie", max_length=20)),
+                (
+                    "stars",
+                    models.FloatField(
+                        default=0,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(10.0),
+                        ],
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='WantToSeeMovie',
+            name="WantToSeeMovie",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('timestamp', models.DateTimeField(default=django.utils.timezone.now)),
-                ('movie', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Movies.tvandmovie')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("timestamp", models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "movie",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="Movies.tvandmovie",
+                    ),
+                ),
             ],
         ),
     ]

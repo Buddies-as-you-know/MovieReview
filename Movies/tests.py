@@ -11,7 +11,6 @@ class CommentModelTests(TestCase):
         """初期状態では何も登録されていないことをチェック"""
         saved_comments = Comment.objects.all()
         self.assertEqual(saved_comments.exists(), False)
-        self.assertNotEqual(saved_comments.count(), 1)
 
 
 class TVAndMovieTests(TestCase):
@@ -34,17 +33,17 @@ class TVAndMovieTests(TestCase):
         )
         create_user_list = [
             CustomUser(
-                email='test{}@example.com'.format(i),
+                email="test{}@example.com".format(i),
             )
             for i in range(0, 100000)
         ]
         CustomUser.objects.bulk_create(create_user_list)
         create_comment_list = [
             Comment(
-                comment='Test-{}'.format(i),
+                comment="Test-{}".format(i),
                 stars=random.uniform(0, 10),
                 user=create_user_list[i],
-                tv_or_movie=obj_test_movie_and_test
+                tv_or_movie=obj_test_movie_and_test,
             )
             for i in range(0, 100000)
         ]
@@ -53,3 +52,11 @@ class TVAndMovieTests(TestCase):
         self.assertEqual(len(create_comment_list), 100000)
         self.assertLessEqual(average_score_test, 10.0)
         self.assertGreaterEqual(average_score_test, 0.0)
+        print(average_score_test)
+
+        def no_comment_get_average_score(self):
+            obj_test_movie_and_test = TVAndMovie.objects.create(
+                tmdb_id=201, judge_tv_or_movie="movie"
+            )
+            average_score_test = obj_test_movie_and_test.average_stars()
+            print(average_score_test)

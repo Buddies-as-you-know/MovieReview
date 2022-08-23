@@ -34,7 +34,7 @@ class CommentCreateForm(ModelForm):
         cleaned_data = super().clean()
         # Always return cleaned_data
         return cleaned_data
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.label_suffix = " "
