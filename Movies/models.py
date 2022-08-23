@@ -1,97 +1,44 @@
 from accounts.models import CustomUser
-from django.core.validators import (MaxValueValidator, MinValueValidator,
-                                    RegexValidator)
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import CheckConstraint, Q, Sum
 from django.utils import timezone
 
-alphanumeric = RegexValidator(r"^[0-9]*$",
-                              "Only alphanumeric characters are allowed.")
 
+class TVAndMovie(models.Model):
+    tmdb_id = models.IntegerField(
+        verbose_name="",
+        blank=False,
+        null=False,
+    )
 
-class Movie(models.Model):
-    id = models.CharField(
-        primary_key=True,
-        editable=False,
-        validators=[alphanumeric],
-        max_length=9999
+    judge_tv_or_movie = models.CharField(
+        blank=False, null=False, default="movie", max_length=20
     )
     stars = models.FloatField(
         blank=False,
         null=False,
-        default=0,
+        default=0.00,
         validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
     )
 
-    def get_comments(self):
-        return Comment_movie.objects.filter(movie_id=self.id)
-
-    def average_stars(self):
-        comments = self.get_comments()
-        n_comments = comments.count()
-
-        if n_comments:
-            self.stars = round(
-                sum([comment.stars for comment in comments]) / n_comments, 3
-            )
+    def average_stars(self) -> float:
+        count = self.comment_set.count()
+        if count:
+            get_sum = self.comment_set.aggregate(Sum("stars"))
+            self.stars = round(get_sum["stars__sum"] / count, 3)
         else:
-            self.stars = 0
+            self.stars = 0.00
         self.save()
         return self.stars
-
-
-class TV(models.Model):
-    id = models.CharField(
-        primary_key=True,
-        editable=False,
-        validators=[alphanumeric],
-        max_length=9999
-    )
-    stars = models.FloatField(
-        blank=False,
-        null=False,
-        default=0,
-        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
-    )
-
-    def get_comments(self):
-        return Comment_tv.objects.filter(tv_id=self.id)
-
-    def average_stars(self):
-        comments = self.get_comments()
-        n_comments = comments.count()
-
-        if n_comments:
-            self.stars = round(
-                sum([comment.stars for comment in comments]) / n_comments, 3
-            )
-        else:
-            self.stars = 0
+        """
+        self.stars = round(self.comment_set.aggregate(Avg('stars')).get('stars__avg'), 3)
         self.save()
-        return self.stars
+        return self.stars or 0
+        """
 
 
-class Comment_movie(models.Model):
-    comment = models.TextField(max_length=1000)
-    stars = models.FloatField(
-        blank=False,
-        null=False,
-        default=0,
-        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
-    )
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.comment[:20]
-
-    class Meta:
-        unique_together = ("user", "movie")
-        indexes = [models.Index(fields=["user", "movie"])]
-
-
-class Comment_tv(models.Model):
+class Comment(models.Model):
 
     comment = models.TextField(max_length=1000)
     stars = models.FloatField(
@@ -101,81 +48,35 @@ class Comment_tv(models.Model):
         validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
     )
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    tv = models.ForeignKey(TV, on_delete=models.CASCADE)
+    tv_or_movie = models.ForeignKey(TVAndMovie, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.comment[:20]
-
     class Meta:
-        unique_together = ("user", "tv")
-        indexes = [
-            models.Index(fields=["user", "tv"]),
-        ]
+        unique_together = ("user", "tv_or_movie")
+        indexes = [models.Index(fields=["user", "tv_or_movie"])]
+        constraints = (
+            # for checking in the DB
+            CheckConstraint(
+                check=Q(stars__gte=0.0) & Q(stars__lte=10.0), name="cooment_stars_range"
+            ),
+        )
 
 
-class LikeForMovie(models.Model):
-    """Movieに対するいいね"""
+class LikeForMovieAndTV(models.Model):
 
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    movie = models.ForeignKey(TVAndMovie, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=timezone.now)
 
-    def __str__(self):
-        return self.timestamp
 
-
-class LikeForTV(models.Model):
-    """TVに対するいいね"""
-
-    tv = models.ForeignKey(TV, on_delete=models.CASCADE)
+class WantToSeeMovieAndTV(models.Model):
+    movie = models.ForeignKey(TVAndMovie, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=timezone.now)
 
-    def __str__(self):
-        return str(self.timestamp)
 
-
-class WantToSeeMovie(models.Model):
-    """Movieに対するみたい"""
-
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+class LikeForComment(models.Model):
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return str(self.timestamp)
-
-
-class WantToSeeTV(models.Model):
-    """TVに対するみたい"""
-
-    tv = models.ForeignKey(TV, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return str(self.timestamp)
-
-
-class LikeForComment_movie(models.Model):
-    """Movieコメントに対するいいね"""
-
-    comment = models.ForeignKey(Comment_movie, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return str(self.timestamp)
-
-
-class LikeForComment_tv(models.Model):
-    """TVコメントに対するいいね"""
-
-    comment = models.ForeignKey(Comment_tv, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return str(self.timestamp)

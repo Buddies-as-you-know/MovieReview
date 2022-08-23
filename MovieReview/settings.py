@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import os  # 追加
 
-import dj_database_url
 from django.contrib.messages import constants as messages  # 追加
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -103,9 +102,10 @@ DATABASES = {
         'PORT': '',
     }
 }
-"""
 db_from_env = dj_database_url.config(conn_max_age=600, ssl_require=True)
 DATABASES["default"].update(db_from_env)
+
+"""
 
 
 # Password validation
